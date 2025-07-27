@@ -1,0 +1,236 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Albion Market Flipper{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1 class="mb-4">
+            <i class="fas fa-tachometer-alt me-2"></i>
+            Market Data Dashboard
+        </h1>
+    </div>
+</div>
+
+<!-- Status Cards -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body text-center">
+                <i class="fas fa-plug fa-2x mb-2 {% if status.connection_established %}text-success{% else %}text-danger{% endif %}"></i>
+                <h5 class="card-title">Connection</h5>
+                <p class="card-text">
+                    {% if status.connection_established %}
+                        <span class="text-success">Connected</span>
+                    {% else %}
+                        <span class="text-danger">Disconnected</span>
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body text-center">
+                <i class="fas fa-user fa-2x mb-2 text-info"></i>
+                <h5 class="card-title">Player</h5>
+                <p class="card-text">
+                    {% if status.current_player %}
+                        {{ status.current_player }}
+                    {% else %}
+                        <span class="text-muted">Unknown</span>
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body text-center">
+                <i class="fas fa-map-marker-alt fa-2x mb-2 text-warning"></i>
+                <h5 class="card-title">Location</h5>
+                <p class="card-text">
+                    {% if status.current_location %}
+                        {{ status.current_location }}
+                    {% else %}
+                        <span class="text-muted">Unknown</span>
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body text-center">
+                <i class="fas fa-cog fa-2x mb-2 {% if status.sniffer_running %}text-success{% else %}text-danger{% endif %}"></i>
+                <h5 class="card-title">Data Sniffer</h5>
+                <p class="card-text">
+                    {% if status.sniffer_running %}
+                        <span class="text-success">Running</span>
+                    {% else %}
+                        <span class="text-danger">Stopped</span>
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Data Statistics -->
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <i class="fas fa-hand-holding-usd me-2"></i>
+                    Market Offers
+                </h5>
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h2 class="mb-0">{{ "{:,}".format(status.offers_count) }}</h2>
+                        <small class="text-muted">Active sell orders</small>
+                    </div>
+                    <i class="fas fa-chart-bar fa-3x text-success"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <i class="fas fa-shopping-basket me-2"></i>
+                    Market Requests
+                </h5>
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h2 class="mb-0">{{ "{:,}".format(status.requests_count) }}</h2>
+                        <small class="text-muted">Active buy orders</small>
+                    </div>
+                    <i class="fas fa-chart-line fa-3x text-primary"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Control Panel -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-control me-2"></i>
+                    Control Panel
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Data Sniffer Control</h6>
+                        <p class="text-muted">Start or stop the real-time data collection from Albion Online.</p>
+                        
+                        {% if status.sniffer_running %}
+                            <form method="POST" action="{{ url_for('stop_sniffer') }}" class="d-inline">
+                                <button type="submit" class="btn btn-danger">
+                                    <i class="fas fa-stop me-1"></i>
+                                    Stop Sniffer
+                                </button>
+                            </form>
+                        {% else %}
+                            <form method="POST" action="{{ url_for('start_sniffer') }}" class="d-inline">
+                                <button type="submit" class="btn btn-success">
+                                    <i class="fas fa-play me-1"></i>
+                                    Start Sniffer
+                                </button>
+                            </form>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <h6>Quick Actions</h6>
+                        <p class="text-muted">Navigate to key sections of the application.</p>
+                        
+                        <a href="{{ url_for('arbitrage') }}" class="btn btn-primary me-2">
+                            <i class="fas fa-search me-1"></i>
+                            Find Opportunities
+                        </a>
+                        
+                        <a href="{{ url_for('cart') }}" class="btn btn-secondary">
+                            <i class="fas fa-shopping-cart me-1"></i>
+                            View Cart
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Instructions -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Getting Started
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        <h6>1. Setup</h6>
+                        <p>Place <code>albiondata-client.exe</code> in the <code>./client/</code> directory and start the data sniffer.</p>
+                    </div>
+                    <div class="col-md-4">
+                        <h6>2. Connect</h6>
+                        <p>Open Albion Online and change locations in-game to establish connection with the client.</p>
+                    </div>
+                    <div class="col-md-4">
+                        <h6>3. Trade</h6>
+                        <p>Navigate to the Arbitrage section to find profitable trading opportunities across cities.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Auto-refresh status every 5 seconds
+setInterval(function() {
+    fetch('/api/status')
+        .then(response => response.json())
+        .then(data => {
+            // Update connection status
+            const connectionIcon = document.querySelector('.fa-plug');
+            const connectionText = connectionIcon.closest('.card-body').querySelector('.card-text span');
+            
+            if (data.connection_established) {
+                connectionIcon.className = 'fas fa-plug fa-2x mb-2 text-success';
+                connectionText.className = 'text-success';
+                connectionText.textContent = 'Connected';
+            } else {
+                connectionIcon.className = 'fas fa-plug fa-2x mb-2 text-danger';
+                connectionText.className = 'text-danger';
+                connectionText.textContent = 'Disconnected';
+            }
+            
+            // Update data counts
+            document.querySelector('h2').textContent = data.offers_count.toLocaleString();
+            document.querySelectorAll('h2')[1].textContent = data.requests_count.toLocaleString();
+            
+            // Update last update time
+            document.getElementById('last-update').textContent = new Date().toLocaleTimeString();
+        })
+        .catch(error => console.error('Error fetching status:', error));
+}, 5000);
+</script>
+{% endblock %}

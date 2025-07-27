@@ -1,0 +1,227 @@
+{% extends "base.html" %}
+
+{% block title %}Shopping Cart - Albion Market Flipper{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1 class="mb-4">
+            <i class="fas fa-shopping-cart me-2"></i>
+            Shopping Cart
+        </h1>
+    </div>
+</div>
+
+<!-- Cart Summary -->
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body text-center">
+                <i class="fas fa-box fa-2x mb-2 text-primary"></i>
+                <h5 class="card-title">Items in Cart</h5>
+                <h3 class="mb-0">{{ cart_items|length }}</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body text-center">
+                <i class="fas fa-coins fa-2x mb-2 text-warning"></i>
+                <h5 class="card-title">Total Investment</h5>
+                <h3 class="mb-0">{{ "{:,}".format(total_investment|int) }}</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body text-center">
+                <i class="fas fa-chart-line fa-2x mb-2 text-success"></i>
+                <h5 class="card-title">Potential Profit</h5>
+                <h3 class="mb-0">{{ "{:,}".format(total_potential_profit|int) }}</h3>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Cart Items -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-list me-2"></i>
+                    Cart Items
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if cart_items %}
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Item</th>
+                                    <th>Quality</th>
+                                    <th>Route</th>
+                                    <th>Buy Price</th>
+                                    <th>Sell Price</th>
+                                    <th>Quantity</th>
+                                    <th>Total Cost</th>
+                                    <th>Total Profit</th>
+                                    <th>ROI</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in cart_items %}
+                                <tr>
+                                    <td>
+                                        <strong>{{ item.item_name }}</strong>
+                                        {% if item.enchant > 0 %}
+                                            <span class="badge bg-warning">+{{ item.enchant }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-secondary">{{ item.quality_name }}</span>
+                                    </td>
+                                    <td>
+                                        <small>
+                                            {{ item.buy_location }}<br>
+                                            <i class="fas fa-arrow-down"></i><br>
+                                            {{ item.sell_location }}
+                                        </small>
+                                    </td>
+                                    <td>{{ "{:,}".format(item.buy_price) }}</td>
+                                    <td>{{ "{:,}".format(item.sell_price) }}</td>
+                                    <td>{{ item.quantity }}</td>
+                                    <td>{{ "{:,}".format(item.total_cost) }}</td>
+                                    <td class="text-success">{{ "{:,}".format(item.total_profit) }}</td>
+                                    <td class="text-info">{{ "%.1f"|format(item.roi_percentage) }}%</td>
+                                    <td>
+                                        <form method="POST" action="{{ url_for('remove_from_cart') }}" class="d-inline">
+                                            <input type="hidden" name="item_id" value="{{ item.id }}">
+                                            <button type="submit" class="btn btn-sm btn-danger">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                            <tfoot>
+                                <tr class="table-dark">
+                                    <th colspan="6">Totals</th>
+                                    <th>{{ "{:,}".format(total_investment|int) }}</th>
+                                    <th class="text-success">{{ "{:,}".format(total_potential_profit|int) }}</th>
+                                    <th class="text-info">
+                                        {% if total_investment > 0 %}
+                                            {{ "%.1f"|format((total_potential_profit / total_investment) * 100) }}%
+                                        {% else %}
+                                            0.0%
+                                        {% endif %}
+                                    </th>
+                                    <th></th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                    
+                    <!-- Action Buttons -->
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <div class="d-flex justify-content-between">
+                                <a href="{{ url_for('arbitrage') }}" class="btn btn-secondary">
+                                    <i class="fas fa-arrow-left me-1"></i>
+                                    Continue Shopping
+                                </a>
+                                
+                                <div>
+                                    <button class="btn btn-warning me-2" onclick="exportCart()">
+                                        <i class="fas fa-download me-1"></i>
+                                        Export Cart
+                                    </button>
+                                    
+                                    <button class="btn btn-success" onclick="markAsExecuted()">
+                                        <i class="fas fa-check me-1"></i>
+                                        Mark as Executed
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="text-center py-5">
+                        <i class="fas fa-shopping-cart fa-3x text-muted mb-3"></i>
+                        <h4>Your cart is empty</h4>
+                        <p class="text-muted">
+                            Add some profitable trading opportunities to your cart from the arbitrage section.
+                        </p>
+                        <a href="{{ url_for('arbitrage') }}" class="btn btn-primary">
+                            <i class="fas fa-search me-1"></i>
+                            Find Opportunities
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Trading Notes -->
+{% if cart_items %}
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-sticky-note me-2"></i>
+                    Trading Notes
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info">
+                    <h6><i class="fas fa-info-circle me-1"></i> Trading Tips</h6>
+                    <ul class="mb-0">
+                        <li>Make sure you have enough silver to purchase all items</li>
+                        <li>Consider transportation costs and risks between cities</li>
+                        <li>Market prices can change rapidly - execute trades quickly</li>
+                        <li>Some items may require premium membership to trade</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+function exportCart() {
+    // Create CSV data
+    let csvContent = "Item,Quality,Buy Location,Sell Location,Buy Price,Sell Price,Quantity,Total Cost,Total Profit,ROI\n";
+    
+    {% for item in cart_items %}
+    csvContent += "{{ item.item_name }},{{ item.quality_name }},{{ item.buy_location }},{{ item.sell_location }},{{ item.buy_price }},{{ item.sell_price }},{{ item.quantity }},{{ item.total_cost }},{{ item.total_profit }},{{ "%.1f"|format(item.roi_percentage) }}%\n";
+    {% endfor %}
+    
+    // Create and download file
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'albion_market_cart_' + new Date().toISOString().slice(0, 10) + '.csv';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+}
+
+function markAsExecuted() {
+    if (confirm('Mark all cart items as executed? This will clear your cart and add the trades to your profit log.')) {
+        // This would typically send a request to the server to log the trades
+        alert('Trades marked as executed! (This would normally save to your profit log)');
+        // In a real implementation, you would make an AJAX call here
+    }
+}
+</script>
+{% endblock %}

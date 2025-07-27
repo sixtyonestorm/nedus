@@ -1,0 +1,285 @@
+{% extends "base.html" %}
+
+{% block title %}Analytics - Albion Market Flipper{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1 class="mb-4">
+            <i class="fas fa-chart-bar me-2"></i>
+            Trading Analytics
+        </h1>
+    </div>
+</div>
+
+<!-- Analytics Cards -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body text-center">
+                <i class="fas fa-handshake fa-2x mb-2 text-success"></i>
+                <h5 class="card-title">Total Trades</h5>
+                <h3 class="mb-0">{{ profit_log|length }}</h3>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body text-center">
+                <i class="fas fa-coins fa-2x mb-2 text-warning"></i>
+                <h5 class="card-title">Total Profit</h5>
+                <h3 class="mb-0">
+                    {% set total_profit = profit_log | sum(attribute='profit') %}
+                    {{ "{:,}".format(total_profit|int) }}
+                </h3>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body text-center">
+                <i class="fas fa-percentage fa-2x mb-2 text-info"></i>
+                <h5 class="card-title">Average ROI</h5>
+                <h3 class="mb-0">
+                    {% if profit_log %}
+                        {{ "%.1f"|format((profit_log | sum(attribute='roi') / profit_log|length)) }}%
+                    {% else %}
+                        0.0%
+                    {% endif %}
+                </h3>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body text-center">
+                <i class="fas fa-trophy fa-2x mb-2 text-danger"></i>
+                <h5 class="card-title">Best Trade</h5>
+                <h3 class="mb-0">
+                    {% if profit_log %}
+                        {% set best_trade = profit_log | max(attribute='profit') %}
+                        {{ "{:,}".format(best_trade.profit|int) }}
+                    {% else %}
+                        0
+                    {% endif %}
+                </h3>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Profit Chart -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-chart-line me-2"></i>
+                    Profit Over Time
+                </h5>
+            </div>
+            <div class="card-body">
+                <canvas id="profitChart" width="400" height="100"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Trade History -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-history me-2"></i>
+                    Trade History
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if profit_log %}
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Item</th>
+                                    <th>Quantity</th>
+                                    <th>Buy Price</th>
+                                    <th>Sell Price</th>
+                                    <th>Profit</th>
+                                    <th>ROI</th>
+                                    <th>Route</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for trade in profit_log|reverse %}
+                                <tr>
+                                    <td>{{ trade.date }}</td>
+                                    <td>{{ trade.item_name }}</td>
+                                    <td>{{ trade.quantity }}</td>
+                                    <td>{{ "{:,}".format(trade.buy_price) }}</td>
+                                    <td>{{ "{:,}".format(trade.sell_price) }}</td>
+                                    <td class="text-success">{{ "{:,}".format(trade.profit) }}</td>
+                                    <td class="text-info">{{ "%.1f"|format(trade.roi) }}%</td>
+                                    <td>
+                                        <small>
+                                            {{ trade.buy_location }} → {{ trade.sell_location }}
+                                        </small>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="text-center py-5">
+                        <i class="fas fa-chart-bar fa-3x text-muted mb-3"></i>
+                        <h4>No Trading History</h4>
+                        <p class="text-muted">
+                            Start trading and your profit history will appear here.
+                        </p>
+                        <a href="{{ url_for('arbitrage') }}" class="btn btn-primary">
+                            <i class="fas fa-search me-1"></i>
+                            Find Opportunities
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Performance Metrics -->
+{% if profit_log %}
+<div class="row mt-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-star me-2"></i>
+                    Top Performing Items
+                </h5>
+            </div>
+            <div class="card-body">
+                <!-- This would show items with highest total profits -->
+                <div class="list-group list-group-flush">
+                    {% set item_profits = {} %}
+                    {% for trade in profit_log %}
+                        {% if item_profits.update({trade.item_name: item_profits.get(trade.item_name, 0) + trade.profit}) %}{% endif %}
+                    {% endfor %}
+                    
+                    {% for item, total_profit in (item_profits.items() | sort(attribute=1, reverse=True))[:5] %}
+                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                        {{ item }}
+                        <span class="badge bg-success">{{ "{:,}".format(total_profit|int) }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-route me-2"></i>
+                    Top Trading Routes
+                </h5>
+            </div>
+            <div class="card-body">
+                <!-- This would show routes with highest total profits -->
+                <div class="list-group list-group-flush">
+                    {% set route_profits = {} %}
+                    {% for trade in profit_log %}
+                        {% set route = trade.buy_location + " → " + trade.sell_location %}
+                        {% if route_profits.update({route: route_profits.get(route, 0) + trade.profit}) %}{% endif %}
+                    {% endfor %}
+                    
+                    {% for route, total_profit in (route_profits.items() | sort(attribute=1, reverse=True))[:5] %}
+                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                        <small>{{ route }}</small>
+                        <span class="badge bg-success">{{ "{:,}".format(total_profit|int) }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+// Profit Chart
+document.addEventListener('DOMContentLoaded', function() {
+    const ctx = document.getElementById('profitChart').getContext('2d');
+    
+    {% if profit_log %}
+    const profitData = [
+        {% for trade in profit_log %}
+        {
+            x: '{{ trade.date }}',
+            y: {{ trade.profit }}
+        },
+        {% endfor %}
+    ];
+    
+    // Calculate cumulative profit
+    let cumulative = 0;
+    const cumulativeData = profitData.map(point => {
+        cumulative += point.y;
+        return {
+            x: point.x,
+            y: cumulative
+        };
+    });
+    {% else %}
+    const cumulativeData = [];
+    {% endif %}
+    
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            datasets: [{
+                label: 'Cumulative Profit',
+                data: cumulativeData,
+                borderColor: 'rgb(75, 192, 192)',
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                tension: 0.1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Cumulative Profit Over Time'
+                }
+            },
+            scales: {
+                x: {
+                    type: 'time',
+                    time: {
+                        parser: 'YYYY-MM-DD'
+                    }
+                },
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return value.toLocaleString();
+                        }
+                    }
+                }
+            }
+        }
+    });
+});
+</script>
+{% endblock %}

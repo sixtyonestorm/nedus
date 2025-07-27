@@ -1,0 +1,241 @@
+/* Custom styles for Albion Market Flipper */
+
+/* Card hover effects */
+.card {
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* Status indicators */
+.status-connected {
+    color: var(--bs-success) !important;
+}
+
+.status-disconnected {
+    color: var(--bs-danger) !important;
+}
+
+/* Profit highlighting */
+.profit-positive {
+    color: var(--bs-success) !important;
+    font-weight: bold;
+}
+
+.profit-negative {
+    color: var(--bs-danger) !important;
+    font-weight: bold;
+}
+
+/* Table enhancements */
+.table-hover tbody tr:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Button spacing */
+.btn + .btn {
+    margin-left: 0.5rem;
+}
+
+/* Quality badges */
+.quality-normal {
+    background-color: var(--bs-secondary);
+}
+
+.quality-good {
+    background-color: var(--bs-success);
+}
+
+.quality-outstanding {
+    background-color: var(--bs-info);
+}
+
+.quality-excellent {
+    background-color: var(--bs-warning);
+}
+
+.quality-masterpiece {
+    background-color: var(--bs-danger);
+}
+
+/* Enchantment badges */
+.enchant-badge {
+    background-color: var(--bs-warning);
+    color: var(--bs-dark);
+}
+
+/* Loading spinner */
+.spinner-custom {
+    width: 2rem;
+    height: 2rem;
+    border: 0.25em solid currentColor;
+    border-right-color: transparent;
+    border-radius: 50%;
+    animation: spinner-border 0.75s linear infinite;
+}
+
+/* Chart container */
+.chart-container {
+    position: relative;
+    height: 400px;
+    width: 100%;
+}
+
+/* Modal enhancements */
+.modal-content {
+    border: none;
+    border-radius: 0.5rem;
+}
+
+/* Filter section */
+.filter-section {
+    background-color: rgba(255, 255, 255, 0.05);
+    border-radius: 0.5rem;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+/* Responsive table wrapper */
+.table-responsive {
+    border-radius: 0.5rem;
+    overflow: hidden;
+}
+
+/* Custom scrollbar for webkit browsers */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bs-dark);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--bs-secondary);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--bs-light);
+}
+
+/* Animation for new data */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fade-in {
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+/* Price change indicators */
+.price-up {
+    color: var(--bs-success);
+}
+
+.price-down {
+    color: var(--bs-danger);
+}
+
+.price-up::after {
+    content: " ↗";
+}
+
+.price-down::after {
+    content: " ↘";
+}
+
+/* Footer styling */
+footer {
+    margin-top: auto;
+}
+
+/* Navigation active state */
+.navbar-nav .nav-link.active {
+    font-weight: bold;
+    color: var(--bs-primary) !important;
+}
+
+/* Card icon styling */
+.card-body i.fa-2x {
+    opacity: 0.8;
+}
+
+/* Alert customization */
+.alert {
+    border: none;
+    border-radius: 0.5rem;
+}
+
+/* Form enhancements */
+.form-control:focus {
+    border-color: var(--bs-primary);
+    box-shadow: 0 0 0 0.2rem rgba(var(--bs-primary-rgb), 0.25);
+}
+
+/* Badge customization */
+.badge {
+    font-size: 0.75em;
+}
+
+/* List group enhancements */
+.list-group-item {
+    background-color: transparent;
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Text truncation utility */
+.text-truncate-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* Spacing utilities */
+.mt-auto {
+    margin-top: auto !important;
+}
+
+/* Print styles */
+@media print {
+    .no-print {
+        display: none !important;
+    }
+    
+    .card {
+        border: 1px solid #000 !important;
+        break-inside: avoid;
+    }
+    
+    .table {
+        font-size: 0.8rem;
+    }
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+    .table-responsive {
+        font-size: 0.9rem;
+    }
+    
+    .card-body {
+        padding: 1rem;
+    }
+    
+    .btn {
+        margin-bottom: 0.5rem;
+    }
+}
